@@ -1,0 +1,8 @@
+{
+  "name": "",
+  "version": "",
+  "dependencies": {
+    "truffle-hdwallet-provider": "0.0.3",
+    "zeppelin-solidity": "1.6.0"
+  }
+}
