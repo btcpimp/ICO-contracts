@@ -2,7 +2,6 @@ pragma solidity ^0.4.17;
 
 import "./ICOCrowdsale.sol";
 import "./ICORefundableCrowdsale.sol";
-// import "../node_modules/zeppelin-solidity/contracts/crowdsale/RefundableCrowdsale.sol";
 import "../node_modules/zeppelin-solidity/contracts/crowdsale/CappedCrowdsale.sol";
 
 /**
