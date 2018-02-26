@@ -32,7 +32,7 @@ contract('ICOCappedRefundableCrowdsale', function (accounts) {
 
 	const _goal = 3000 * weiInEther;
 
-	xdescribe("initializing crowsale", () => {
+	describe("initializing crowsale", () => {
 		it("should set initial values correctly", async function () {
 			await timeTravel(web3, day);
 			_startTime = web3FutureTime(web3);
@@ -62,7 +62,7 @@ contract('ICOCappedRefundableCrowdsale', function (accounts) {
 		})
 	});
 
-	xdescribe('cap', () => {
+	describe('cap', () => {
 		beforeEach(async function () {
 			_startTime = web3FutureTime(web3);
 			_endTime = _startTime + sixtyThreeDays;
@@ -426,7 +426,7 @@ contract('ICOCappedRefundableCrowdsale', function (accounts) {
 		})
 	})
 
-	xdescribe('finalization', () => {
+	describe('finalization', () => {
 		beforeEach(async function () {
 			_startTime = web3FutureTime(web3);
 			_endTime = _startTime + sixtyThreeDays;
