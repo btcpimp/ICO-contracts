@@ -32,7 +32,7 @@ contract('ICOCappedRefundableCrowdsale', function (accounts) {
 
 	const _goal = 3000 * weiInEther;
 
-	describe("initializing crowsale", () => {
+	xdescribe("initializing crowsale", () => {
 		it("should set initial values correctly", async function () {
 			await timeTravel(web3, day);
 			_startTime = web3FutureTime(web3);
@@ -62,7 +62,7 @@ contract('ICOCappedRefundableCrowdsale', function (accounts) {
 		})
 	});
 
-	describe('cap', () => {
+	xdescribe('cap', () => {
 		beforeEach(async function () {
 			_startTime = web3FutureTime(web3);
 			_endTime = _startTime + sixtyThreeDays;
@@ -236,7 +236,7 @@ contract('ICOCappedRefundableCrowdsale', function (accounts) {
 		})
 	})
 
-	describe('finalization', () => {
+	describe('close Vault', () => {
 		beforeEach(async function () {
 			_startTime = web3FutureTime(web3);
 			_endTime = _startTime + sixtyThreeDays;
@@ -267,7 +267,196 @@ contract('ICOCappedRefundableCrowdsale', function (accounts) {
 			})
 
 			const initialBalance = web3.eth.getBalance(_wallet);
+			await timeTravel(web3, sixtyThreeDays);
+			await crowdsaleInstance.closeVault();
+			const finalBalance = web3.eth.getBalance(_wallet);
 
+			assert(finalBalance.eq(initialBalance.plus(weiSent * 3)), "The balance was not correct");
+		})
+
+		it("should throw closing the vault if goal is not reached", async function () {
+			await timeTravel(web3, thirtyDays);
+			const weiSent = 1000 * weiInEther;
+
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+
+			await timeTravel(web3, sixtyThreeDays);
+			await expectThrow(crowdsaleInstance.closeVault());
+		})
+
+		it("should forward the funds if goal is reached and finalize", async function () {
+			await timeTravel(web3, thirtyDays);
+			const weiSent = 1000 * weiInEther;
+
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+
+			const initialBalance = web3.eth.getBalance(_wallet);
+			await timeTravel(web3, thirtyDays);
+			await crowdsaleInstance.closeVault();
+
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+
+			await timeTravel(web3, sixtyThreeDays);
+			await crowdsaleInstance.finalize();
+			const finalBalance = web3.eth.getBalance(_wallet);
+
+			assert(finalBalance.eq(initialBalance.plus(weiSent * 4)), "The balance was not correct");
+		})
+
+		it("should forward the funds if vault is closed", async function () {
+			await timeTravel(web3, thirtyDays);
+			const weiSent = 1000 * weiInEther;
+
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+
+			await timeTravel(web3, thirtyDays);
+			await crowdsaleInstance.closeVault();
+
+			const initialBalance = web3.eth.getBalance(_wallet);
+
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+
+			const finalBalance = web3.eth.getBalance(_wallet);
+
+			assert(finalBalance.eq(initialBalance.plus(weiSent)), "The balance was not correct");
+		})
+
+		it("should not forward the funds if vault is not closed", async function () {
+			await timeTravel(web3, thirtyDays);
+			const weiSent = 1000 * weiInEther;
+
+			const initialBalance = web3.eth.getBalance(_wallet);
+
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+
+			await timeTravel(web3, thirtyDays);
+			const finalBalance = web3.eth.getBalance(_wallet);
+
+			assert(finalBalance.eq(initialBalance), "The balance was not correct");
+		})
+
+		it("can not claim refund after vault is closed", async function () {
+			await timeTravel(web3, thirtyDays);
+			const weiSent = 1000 * weiInEther;
+
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+
+			await timeTravel(web3, sixtyThreeDays);
+			await crowdsaleInstance.closeVault();
+			await expectThrow(crowdsaleInstance.claimRefund({
+				from: _alice
+			}));
+		})
+
+		it("should unpause the token on cap", async function () {
+			await timeTravel(web3, thirtyDays);
+			const weiSent = 1000 * weiInEther;
+
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+
+			await timeTravel(web3, sixtyThreeDays);
+
+			await crowdsaleInstance.finalize();
+			let paused = await tokenInstance.paused.call();
+			assert.isFalse(paused, "The token contract was not unpaused");
+		})
+	})
+
+	xdescribe('finalization', () => {
+		beforeEach(async function () {
+			_startTime = web3FutureTime(web3);
+			_endTime = _startTime + sixtyThreeDays;
+
+			crowdsaleInstance = await ICOCappedRefundableCrowdsale.new(_startTime, _endTime, _cap, _goal, _wallet, {
+				from: _owner
+			});
+
+			let tokenAddress = await crowdsaleInstance.token.call();
+			tokenInstance = ICOToken.at(tokenAddress);
+		})
+
+		it("should forward the funds if goal is reached", async function () {
+			await timeTravel(web3, thirtyDays);
+			const weiSent = 1000 * weiInEther;
+
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+			await crowdsaleInstance.buyTokens(_alice, {
+				value: weiSent,
+				from: _alice
+			})
+
+			const initialBalance = web3.eth.getBalance(_wallet);
 			await timeTravel(web3, sixtyThreeDays);
 			await crowdsaleInstance.finalize();
 			const finalBalance = web3.eth.getBalance(_wallet);
