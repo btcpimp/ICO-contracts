@@ -16,8 +16,8 @@ module.exports = async function (deployer, network) {
 	const isDevNetwork = (network == 'development' || network == 'td' || network == 'ganache');
 	const fifteenMinutes = 15;
 	const sixtyThreeInMinutes = 63 * 24 * 60;
-	const _startTime = (isDevNetwork) ? getWeb3FutureTimestamp(fifteenMinutes) : getFutureTimestamp(fifteenMinutes);
-	const _endTime = (isDevNetwork) ? getWeb3FutureTimestamp(nintyDaysInMinutes) : getFutureTimestamp(sixtyThreeInMinutes);
+	const _startTime = 1521417600; // (isDevNetwork) ? getWeb3FutureTimestamp(fifteenMinutes) : getFutureTimestamp(fifteenMinutes);
+	const _endTime = 1526860800; // (isDevNetwork) ? getWeb3FutureTimestamp(nintyDaysInMinutes) : getFutureTimestamp(sixtyThreeInMinutes);
 	const _wallet = '0xAeCF9c56dfB558590CFD0944644b96bBc681CF69'; // Vibeo Address for ETH
 	const weiInEther = 1000000000000000000;
 	const _goal = 3000 * weiInEther;

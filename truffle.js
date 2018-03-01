@@ -1,7 +1,7 @@
-var HDWalletProvider = require("truffle-hdwallet-provider");
-let ropstenMnemonic = 'unusual coconut pistol sting happy smart exchange volume pottery antenna laundry trumpet';
-let infuraRopsten = 'https://ropsten.infura.io/H4UAAWyThMPs2WB9LsHD ';
-let infuraRinkeby = 'https://rinkeby.infura.io/H4UAAWyThMPs2WB9LsHD';
+const HDWalletProvider = require("truffle-hdwallet-provider-privkey");
+let privateKey = "asdasdas";
+let infuraRopsten = 'https://ropsten.infura.io/ID';
+let infuraRinkeby = 'https://rinkeby.infura.io/ID';
 
 module.exports = {
 	networks: {
@@ -22,15 +22,15 @@ module.exports = {
 		},
 		ropsten: {
 			provider: function () {
-				return new HDWalletProvider(ropstenMnemonic, infuraRopsten)
+				return new HDWalletProvider(privateKey, infuraRopsten)
 			},
 			network_id: 3,
-			port: 8545,
-			gas: 4000000
+			gas: 4000000,
+			gasPrice: 20000000000
 		},
 		rinkeby: {
 			provider: function () {
-				return new HDWalletProvider(ropstenMnemonic, infuraRinkeby)
+				return new HDWalletProvider(privateKey, infuraRinkeby)
 			},
 			network_id: 4,
 			port: 8545,
